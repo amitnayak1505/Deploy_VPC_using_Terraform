@@ -21,7 +21,7 @@ locals {
 }
 
 resource "aws_subnet" "public" {
- count = 2
+ count = length(local.public_cidr)
 
   vpc_id     = aws_vpc.main.id
   cidr_block = local.public_cidr[count.index]
@@ -32,7 +32,7 @@ resource "aws_subnet" "public" {
 }
 
 resource "aws_subnet" "private" {
- count = 2
+ count = length(local.private_cidr)
 
   vpc_id     = aws_vpc.main.id
   cidr_block = local.private_cidr[count.index]
@@ -52,7 +52,7 @@ resource "aws_internet_gateway" "main" {
 
 resource "aws_eip" "nat" {
  count = 2
-  
+
   vpc = true
 }
 
@@ -108,6 +108,57 @@ resource "aws_route_table_association" "private" {
 
   subnet_id      = aws_subnet.private[count.index].id
   route_table_id = aws_route_table.private[count.index].id
-    
+
+}
+
+resource "aws_instance" "myec2" {
+  ami           = "ami-0cff7528ff583bf9a"
+  instance_type = "t2.micro"
+  tags = {
+    Name = "Terraform-Ec2"
+  }
+}
+
+resource "aws_security_group" "securitygroup" {
+  name        = "securitygroup"
+  description = "Allow TLS inbound traffic"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    description = "Inbound rules from VPC"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [aws_vpc.main.cidr_block]
+
+  }
+  ingress {
+    description = "Inbound rules from VPC"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [aws_vpc.main.cidr_block]
+
+  }
+
+  ingress {
+    description = "Inbound rules from VPC"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = [aws_vpc.main.cidr_block]
+
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "securitygroup"
+  }
 }
 
