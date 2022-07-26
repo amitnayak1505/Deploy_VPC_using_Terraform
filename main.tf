@@ -117,7 +117,7 @@ resource "aws_route_table_association" "private" {
 resource "aws_instance" "myec2" {
   associate_public_ip_address = true
   instance_type               = "t3.micro"
-  vpc_security_group_ids      = [aws_security_group.public.id]
+  vpc_security_group_ids      = [aws_security_group.securitygroup.id]
   subnet_id                   = aws_subnet.public[1].id
  tags = {
    Name = "${var.env_code}-public"
