@@ -1,15 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 3.0"
-    }
-  }
-}
-
-provider "aws" {
-  region = "us-east-1"
-}
 
 resource "aws_vpc" "main" {
   cidr_block = var.vpc_cidr
@@ -112,57 +100,4 @@ resource "aws_route_table_association" "private" {
   subnet_id      = aws_subnet.private[count.index].id
   route_table_id = aws_route_table.private[count.index].id
 
-}
-
-resource "aws_instance" "myec2" {
-  associate_public_ip_address = true
-  instance_type               = "t3.micro"
-  vpc_security_group_ids      = [aws_security_group.public.id]
-  subnet_id                   = aws_subnet.public[1].id
- tags = {
-   Name = "${var.env_code}-public"
- }
-}
-
-resource "aws_security_group" "securitygroup" {
-  name        = "securitygroup"
-  description = "Allow TLS inbound traffic"
-  vpc_id      = aws_vpc.main.id
-
-  ingress {
-    description = "Inbound rules from VPC"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = [aws_vpc.main.cidr_block]
-
-  }
-  ingress {
-    description = "Inbound rules from VPC"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = [aws_vpc.main.cidr_block]
-
-  }
-
-  ingress {
-    description = "Inbound rules from VPC"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [aws_vpc.main.cidr_block]
-
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "securitygroup"
-  }
 }
