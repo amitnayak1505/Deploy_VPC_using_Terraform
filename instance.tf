@@ -15,7 +15,6 @@ data "aws_ami" "linuxinstance" {
 
 }
 
-
 resource "aws_instance" "public" {
   ami                         = data.aws_ami.linuxinstance.id
   associate_public_ip_address = true
