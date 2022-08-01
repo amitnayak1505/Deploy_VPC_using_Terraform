@@ -20,7 +20,17 @@ resource "aws_instance" "public" {
   ami                         = data.aws_ami.linuxinstance.id
   associate_public_ip_address = true
   instance_type               = "t2.micro"
+  key_name                    = "devpair"
   vpc_security_group_ids      = [aws_security_group.public.id]
+  
+  user_data = <<-EOF
+  #!/bin/bash
+  echo "*** Installing apache2"
+  sudo apt update -y
+  sudo apt install apache2 -y
+  echo "*** Completed Installing apache2"
+  EOF
+
   subnet_id                   = aws_subnet.public[1].id
  tags = {
    Name = "${var.env_code}-public"
@@ -54,7 +64,7 @@ resource "aws_security_group" "public" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [aws_vpc.main.cidr_block]
+    cidr_blocks = [aws_vpc.main.cidr_block, "49.207.213.119/32"]
 
   }
 
