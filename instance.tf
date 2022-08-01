@@ -64,7 +64,7 @@ resource "aws_security_group" "public" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [aws_vpc.main.cidr_block, "49.207.213.119/32"]
+    cidr_blocks = [aws_vpc.main.cidr_block, "<Public-IP>"]
 
   }
 
