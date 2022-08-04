@@ -26,11 +26,14 @@ resource "aws_instance" "public" {
   user_data = <<-EOF
   #!/bin/bash
   echo "*** Installing apache2"
-  sudo apt update -y
-  sudo apt install apache2 -y
+  yum update -y
+  yum install httpd -y
   echo "*** Completed Installing apache2"
+  systemctl start httpd
+  systemctl enable httpd
+  echo "<html><body><h1>Hi there</h1></body></html>" > /var/www/html/index.html
   EOF
-
+  
   subnet_id                   = aws_subnet.public[1].id
  tags = {
    Name = "${var.env_code}-public"
@@ -55,8 +58,7 @@ resource "aws_security_group" "public" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = [aws_vpc.main.cidr_block]
-
+    cidr_blocks = [aws_vpc.main.cidr_block, "49.207.195.192/32"]
   }
 
   ingress {
@@ -64,14 +66,14 @@ resource "aws_security_group" "public" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [aws_vpc.main.cidr_block, "49.207.213.119/32"]
+    cidr_blocks = [aws_vpc.main.cidr_block, "49.207.195.192/32"]
 
   }
 
   egress {
     from_port   = 0
     to_port     = 0
-    protocol    = "tcp"
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
