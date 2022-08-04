@@ -15,7 +15,6 @@ data "aws_ami" "linuxinstance" {
 
 }
 
-
 resource "aws_instance" "public" {
   ami                         = data.aws_ami.linuxinstance.id
   associate_public_ip_address = true
@@ -34,6 +33,7 @@ resource "aws_instance" "public" {
   echo "<html><body><h1>Hi there</h1></body></html>" > /var/www/html/index.html
   EOF
   
+  vpc_security_group_ids      = [aws_security_group.public.id]
   subnet_id                   = aws_subnet.public[1].id
  tags = {
    Name = "${var.env_code}-public"
@@ -59,6 +59,7 @@ resource "aws_security_group" "public" {
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = [aws_vpc.main.cidr_block, "49.207.195.192/32"]
+
   }
 
   ingress {
@@ -67,6 +68,7 @@ resource "aws_security_group" "public" {
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = [aws_vpc.main.cidr_block, "49.207.195.192/32"]
+
 
   }
 
