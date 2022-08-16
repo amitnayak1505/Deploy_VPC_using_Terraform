@@ -101,3 +101,12 @@ resource "aws_route_table_association" "private" {
   route_table_id = aws_route_table.private[count.index].id
 
 }
+
+terraform {
+  backend "s3" {
+    bucket         = "s3bucketamit"
+    key            = "terraform.tfstate"
+    region         = "us-east-1"
+    dynamodb_table = "newtableam"
+  }
+}
