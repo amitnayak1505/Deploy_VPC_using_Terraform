@@ -21,7 +21,7 @@ resource "aws_security_group" "sglb" {
   }
 
   tags = {
-    Name = "sglb"
+    Name = "${var.env_code}-sglb"
   }
 
   lifecycle {
@@ -73,7 +73,9 @@ resource "aws_lb" "appln-lb" {
 }
 
 resource "aws_lb_listener" "listner" {
-
+  
+  count = 2
+  
   load_balancer_arn = aws_lb.appln-lb[count.index].id
   port              = 80
   protocol          = "HTTP"
