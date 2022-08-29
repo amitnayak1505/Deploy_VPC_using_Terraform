@@ -73,9 +73,7 @@ resource "aws_lb" "appln-lb" {
 }
 
 resource "aws_lb_listener" "listner" {
-  
-  count = 2
-  
+    count = 2
   load_balancer_arn = aws_lb.appln-lb[count.index].id
   port              = 80
   protocol          = "HTTP"
