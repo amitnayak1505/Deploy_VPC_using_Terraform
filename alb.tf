@@ -58,7 +58,6 @@ resource "aws_lb_target_group" "sample_tg" {
 }
 
 resource "aws_lb" "appln-lb" {
-  count = length(var.public_cidr)
 
   name               = "appln-lb"
   internal           = false
