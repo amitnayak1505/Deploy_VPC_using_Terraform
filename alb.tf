@@ -74,8 +74,6 @@ resource "aws_lb" "appln-lb" {
 
 resource "aws_lb_listener" "listner" {
 
-  count = 2
-
   load_balancer_arn = aws_lb.appln-lb[count.index].id
   port              = 80
   protocol          = "HTTP"
@@ -93,8 +91,7 @@ resource "aws_lb_listener" "listner" {
 }
 
 resource "aws_lb_listener_rule" "rule" {
-  count = 2
-
+  
   listener_arn = aws_lb_listener.listner[count.index].id
   priority     = 100
 
