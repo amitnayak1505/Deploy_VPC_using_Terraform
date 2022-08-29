@@ -10,22 +10,6 @@ resource "aws_security_group" "sglb" {
    cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]
   }
-  ingress {
-    description      = "HTTPS"
-    from_port        = 443
-    to_port          = 443
-    protocol         = "tcp"
-   cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
-  ingress {
-    description      = "SSH"
-    from_port        = 22
-    to_port          = 22
-    protocol         = "tcp"
-   cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
 
   egress {
     from_port        = 0
@@ -43,6 +27,36 @@ resource "aws_security_group" "sglb" {
   }
 }
 
+
+resource "aws_lb_target_group" "sample_tg" {
+  name     = "lb-tg-1"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = aws_vpc.main.id
+  load_balancing_algorithm_type = "round_robin"
+  deregistration_delay = 60
+  stickiness {
+    enabled = false
+    type    = "lb_cookie"
+    cookie_duration = 60
+  }
+
+  health_check {
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    interval            = 30
+    path                = "/"
+    protocol            = "HTTP"
+    matcher             = 200
+    
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+
 resource "aws_lb" "appln-lb" {
   count = length(var.public_cidr)
   name               = "appln-lb"
@@ -56,11 +70,13 @@ resource "aws_lb" "appln-lb" {
   }
 }
 
-resource "aws_lb_listener" "listner" {
 
-  load_balancer_arn =aws_lb.appln-lb.id
+resource "aws_lb_listener" "listner" {
+  count = 2
+  load_balancer_arn =aws_lb.appln-lb[count.index].id
   port              = 80
   protocol          = "HTTP"
+
 default_action {
     type = "fixed-response"
     fixed_response {
@@ -74,8 +90,8 @@ default_action {
 }
 
 resource "aws_lb_listener_rule" "rule" {
-
-  listener_arn = aws_lb_listener.listner.id
+  count = 2
+  listener_arn = aws_lb_listener.listner[count.index].id
   priority     = 100
 
   action {
