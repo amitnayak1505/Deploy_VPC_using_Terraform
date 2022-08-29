@@ -29,7 +29,6 @@ resource "aws_security_group" "sglb" {
   }
 }
 
-
 resource "aws_lb_target_group" "sample_tg" {
   name                          = "lb-tg-1"
   port                          = 80
@@ -51,7 +50,6 @@ resource "aws_lb_target_group" "sample_tg" {
     path                = "/"
     protocol            = "HTTP"
     matcher             = 200
-
   }
 
   lifecycle {
@@ -59,9 +57,7 @@ resource "aws_lb_target_group" "sample_tg" {
   }
 }
 
-
 resource "aws_lb" "appln-lb" {
-
   count = length(var.public_cidr)
 
   name               = "appln-lb"
@@ -76,7 +72,6 @@ resource "aws_lb" "appln-lb" {
     Environment = "${var.env_code}-appln-lb"
   }
 }
-
 
 resource "aws_lb_listener" "listner" {
 
@@ -99,7 +94,6 @@ resource "aws_lb_listener" "listner" {
 }
 
 resource "aws_lb_listener_rule" "rule" {
-
   count = 2
 
   listener_arn = aws_lb_listener.listner[count.index].id
