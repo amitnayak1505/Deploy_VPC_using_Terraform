@@ -55,7 +55,12 @@ resource "aws_lb_target_group" "sample_tg" {
   lifecycle {
     create_before_destroy = true
   }
+  
+  tags = {
+    Environment = "${var.env_code}-sample_tg"
+  }
 }
+
 
 resource "aws_lb" "appln-lb" {
 
@@ -88,6 +93,10 @@ resource "aws_lb_listener" "listner" {
   }
 
   depends_on = [aws_lb.appln-lb]
+  
+  tags = {
+    Environment = "${var.env_code}-listner"
+  }
 }
 
 resource "aws_lb_listener_rule" "rule" {
@@ -104,5 +113,8 @@ resource "aws_lb_listener_rule" "rule" {
     host_header {
       values = ["my-service.*.terraform.io"]
     }
+  }
+  tags = {
+    Environment = "${var.env_code}-rule"
   }
 }
