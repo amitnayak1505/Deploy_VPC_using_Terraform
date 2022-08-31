@@ -61,7 +61,6 @@ resource "aws_lb_target_group" "sample_tg" {
   }
 }
 
-
 resource "aws_lb" "appln-lb" {
 
   name               = "appln-lb"
@@ -114,6 +113,7 @@ resource "aws_lb_listener_rule" "rule" {
       values = ["my-service.*.terraform.io"]
     }
   }
+  
   tags = {
     Environment = "${var.env_code}-rule"
   }
