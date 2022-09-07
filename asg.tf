@@ -12,7 +12,6 @@ data "aws_ami" "linuxinstance" {
     values = ["hvm"]
   }
 
-
 }
 
 resource "aws_launch_configuration" "ec2" {
