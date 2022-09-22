@@ -16,10 +16,11 @@ data "aws_ami" "linuxinstance" {
 }
 
 resource "aws_launch_configuration" "ec2" {
-  image_id        = data.aws_ami.linuxinstance.id
-  instance_type   = var.type
-  security_groups = [aws_security_group.public.id]
-  user_data       = file("userdata1.sh")
+  image_id             = data.aws_ami.linuxinstance.id
+  instance_type        = var.type
+  iam_instance_profile = aws_iam_instance_profile.test_profile.name
+  security_groups      = [aws_security_group.public.id]
+  user_data            = file("userdata1.sh")
 
   lifecycle {
     create_before_destroy = true
@@ -27,6 +28,8 @@ resource "aws_launch_configuration" "ec2" {
 }
 
 resource "aws_autoscaling_group" "asg" {
+  count                = 2
+  subnets              = [aws_subnet.public[count.index].id]
   launch_configuration = aws_launch_configuration.ec2.id
   health_check_type    = "EC2"
   min_size             = 1
@@ -43,3 +46,5 @@ resource "aws_autoscaling_group" "asg" {
     create_before_destroy = true
   }
 }
+
+
